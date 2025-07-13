@@ -1,21 +1,31 @@
 locals {
-  label = "${var.stage}-${var.service}-${random_string.s.result}"
-  tags  = ["stage:${var.stage}", "service:${var.service}", "component:backups"]
+  linode_ns_servers = [
+    "ns1.linode.com",
+    "ns2.linode.com",
+    "ns3.linode.com",
+    "ns4.linode.com",
+    "ns5.linode.com",
+  ]
+
+  soa_email = var.soa_email != null ? var.soa_email : "hostmaster@${var.parent_zone}"
 }
 
-resource "random_string" "s" {
-  length  = 4
-  special = false
-  upper   = false
+resource "linode_domain" "d" {
+  type      = "master"
+  domain    = "${var.zone_name}.${var.parent_zone}"
+  soa_email = local.soa_email
 }
 
-resource "linode_object_storage_bucket" "b" {
-  region = var.region
-  label  = local.label
+# data "aws_route53_zone" "parent" {
+#   name = var.parent_zone
+# }
 
-  access_key = var.versioning.enabled ? var.versioning.access_key_id : null
-  secret_key = var.versioning.enabled ? var.versioning.secret_access_key : null
+# module ""
 
-  versioning = var.versioning.enabled
-  acl        = "private"
-}
+# resource "aws_route53_record" "parent" {
+#   name    = linode_domain.d.domain
+#   ttl     = 300
+#   type    = "NS"
+#   zone_id = data.aws_route53_zone.parent.zone_id
+#   records = local.linode_ns_servers
+# }

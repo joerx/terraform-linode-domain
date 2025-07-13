@@ -1,26 +1,15 @@
-variable "region" {
-  description = "Linode region to create the bucket in"
+variable "zone_name" {
+  description = "Name of the zone to create, e.g. 'mydomain'."
   type        = string
 }
 
-variable "stage" {
-  description = "Deployment stage"
+variable "parent_zone" {
+  description = "Domain name of the parent zone, e.g. 'example.com'."
   type        = string
 }
 
-variable "service" {
-  description = "Service name"
+variable "soa_email" {
   type        = string
-}
-
-variable "versioning" {
-  description = "Enable versioning for the bucket"
-  type = object({
-    enabled           = bool
-    access_key_id     = optional(string)
-    secret_access_key = optional(string)
-  })
-  default = {
-    enabled = false
-  }
+  default     = null
+  description = "SOA email address for the domain. If not provided, defaults to 'hostmaster@<parent_zone>'."
 }
